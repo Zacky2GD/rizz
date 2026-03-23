@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "bucin-ai",
+  "name": "rizz-ai",
   "builds": [
     {
       "src": "api/**/*.js",
@@ -20,8 +20,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "GEMINI_API_KEY": "@gemini-api-key"
-  }
+  ]
 }
