@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bucin.ai Pro - Gemini Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --primary: #00d4ff;
+            --secondary: #ff00ff;
+            --accent: #00ff88;
+            --warning: #ffaa00;
+            --gemini: #4285f4;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #050505;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: white;
+            position: relative;
+        }
+
+        .bg-animation {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(66, 133, 244, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(234, 67, 53, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(251, 188, 5, 0.15) 0%, transparent 50%);
+            filter: blur(60px);
+            animation: bgMove 20s ease infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(2deg); }
+            66% { transform: translate(-20px, 20px) rotate(-2deg); }
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--gemini) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .settings-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--gemini);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--gemini);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .api-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .api-input:focus {
+            outline: none;
+            border-color: var(--gemini);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .provider-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .provider-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .provider-btn.active {
+            background: rgba(66, 133, 244, 0.2);
+            border-color: var(--gemini);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--gemini), #34a853);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-online {
+            background: rgba(66, 133, 244, 0.2);
+            color: var(--gemini);
+            border: 1px solid rgba(66, 133, 244, 0.3);
+        }
+
+        .status-offline {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .section { display: none; }
+        .section.active { 
+            display: block; 
+            animation: slideUp 0.5s; 
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .menu-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .option-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .option-card:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--gemini);
+            transform: scale(1.02);
+        }
+
+        .option-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--gemini), #34a853);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        .content-display {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+            min-height: 150px;
+        }
+
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+            color: var(--gemini);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--gemini), #34a853);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(66, 133, 244, 0.4);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .input-area {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            font-family: inherit;
+            font-size: 1.1em;
+            resize: vertical;
+            margin: 20px 0;
+        }
+
+        .input-area:focus {
+            outline: none;
+            border-color: var(--gemini);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show { display: block; }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--gemini);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95em;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        .analysis-result {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .score-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-big {
+            font-size: 4em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gemini), #34a853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .verdict-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-top: 10px;
+            color: white;
+        }
+
+        .ai-feedback {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid var(--gemini);
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .ai-feedback h4 {
+            color: var(--gemini);
+            margin-bottom: 10px;
+        }
+
+        .error-box {
+            background: rgba(234, 67, 53, 0.1);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+            color: #ea4335;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .gemini-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 700;
+            color: white;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 600px) {
+            .glass-card { padding: 25px; }
+            h1 { font-size: 1.8em; }
+            .header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <h2>⚙️ Gemini Configuration</h2>
+            
+            <div class="provider-select">
+                <button class="provider-btn active" onclick="selectProvider('gemini')">Gemini (Free)</button>
+                <button class="provider-btn" onclick="selectProvider('openai')">OpenAI</button>
+                <button class="provider-btn" onclick="selectProvider('groq')">Groq</button>
+            </div>
+
+            <div class="input-group">
+                <label>API Key <span id="providerLabel">(Gemini - Gratis)</span></label>
+                <input type="password" class="api-input" id="apiKeyInput" placeholder="AIzaSy...">
+                <small style="color: rgba(255,255,255,0.5); display: block; margin-top: 5px;">
+                    Ambil API Key gratis di <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--gemini);">aistudio.google.com/app/apikey</a>
+                </small>
+            </div>
+
+            <div class="input-group">
+                <label>Model</label>
+                <select class="api-input" id="modelSelect">
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash (Cepat & Hemat)</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro (Jempolan)</option>
+                    <option value="gemini-pro">Gemini Pro (Legacy)</option>
+                </select>
+            </div>
+
+            <div style="background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px; font-size: 0.9em;">
+                <strong style="color: var(--gemini);">✨ Kenapa Gemini?</strong><br>
+                • 1,500 requests/hari GRATIS<br>
+                • 15 requests/menit<br>
+                • 1 juta tokens/menit<br>
+                • Gak perlu CORS extension!
+            </div>
+
+            <button class="save-btn" onclick="saveSettings()">💾 Simpan & Tutup</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="glass-card">
+            
+            <div id="mainMenu" class="section active">
+                <div class="header">
+                    <div>
+                        <h1>Bucin.ai <span class="gemini-badge">⚡ GEMINI</span></h1>
+                        <div style="display: flex; align-items: center; margin-top: 5px;">
+                            <span class="status-badge status-offline" id="statusBadge">
+                                <span class="dot"></span>
+                                <span id="statusText">Offline Mode</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div class="mode-toggle">
+                            <span>AI Mode</span>
+                            <div class="toggle-switch" id="modeToggle" onclick="toggleMode()"></div>
+                        </div>
+                        <button class="settings-btn" onclick="openSettings()">
+                            ⚙️ Settings
+                        </button>
+                    </div>
+                </div>
+
+                <p class="subtitle" style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 30px;">
+                    AI-Powered Dating Assistant dengan Gemini<br>
+                    <small id="modeDescription">Mode Offline: Menggunakan algoritma lokal</small>
+                </p>
+                
+                <div class="menu-grid">
+                    <div class="menu-item rizz" onclick="selectType('rizz')">
+                        <span class="icon">😎</span>
+                        <div style="font-weight: 700; font-size: 1.2em;">Rizz</div>
+                        <div style="font-size: 0.9em; opacity: 0.7;">Charisma Game</div>
+                    </div>
+                    
+                    <div class="menu-item gombal" onclick="selectType('gombal')">
+                        <span class="icon">🧀</span>
+                        <div style="font-weight: 700; font-size: 1.2em;">Gombal</div>
+                        <div style="font-size: 0.9em; opacity: 0.7;">Cheesy Lines</div>
+                    </div>
+                    
+                    <div class="menu-item pantun" onclick="selectType('pantun')">
+                        <span class="icon">📜</span>
+                        <div style="font-weight: 700; font-size: 1.2em;">Pantun</div>
+                        <div style="font-size: 0.9em; opacity: 0.7;">Poetry Flirt</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="subMenu" class="section">
+                <button class="back-btn" onclick="goBack('mainMenu')">← Kembali</button>
+                <h2 style="margin-bottom: 5px;">Mode: <span id="selectedType" style="color: var(--gemini); text-transform: capitalize;"></span></h2>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 30px;">Pilih fitur yang mau dipake</p>
+                
+                <div class="option-card" onclick="showGenerate()">
+                    <div class="option-icon">✨</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1.2em;">Generate AI</div>
+                        <div style="font-size: 0.9em; opacity: 0.7;">Gemini bakal bikinin konten fresh</div>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="showRate()">
+                    <div class="option-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">🎯</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 1.2em;">Analyze & Rate</div>
+                        <div style="font-size: 0.9em; opacity: 0.7;">Gemini expert review tulisan lu</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="generateSection" class="section">
+                <button class="back-btn" onclick="goBack('subMenu')">← Kembali</button>
+                <h2>Generate <span id="genType" style="color: var(--gemini);"></span></h2>
+                
+                <div class="loading" id="genLoading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Gemini lagi mikir<span class="loading-dots"></span></div>
+                </div>
+
+                <div class="content-display" id="genContent">
+                    <span style="opacity: 0.5;">Klik tombol di bawah untuk generate konten...</span>
+                </div>
+
+                <div class="error-box" id="genError"></div>
+                
+                <button class="action-btn" id="genBtn" onclick="generateContent()">
+                    Generate dengan Gemini ✨
+                </button>
+            </div>
+
+            <div id="rateSection" class="section">
+                <button class="back-btn" onclick="goBack('subMenu')">← Kembali</button>
+                <h2>Analyze <span id="rateType" style="color: var(--gemini);"></span></h2>
+                
+                <textarea 
+                    class="input-area" 
+                    id="userInput" 
+                    placeholder="Paste tulisan lu di sini untuk dianalisis AI..."
+                ></textarea>
+
+                <div class="loading" id="rateLoading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Gemini lagi nge-review<span class="loading-dots"></span></div>
+                </div>
+
+                <div class="error-box" id="rateError"></div>
+                
+                <button class="action-btn" id="rateBtn" onclick="analyzeContent()" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                    Analyze dengan Gemini 🚀
+                </button>
+
+                <div id="rateResult" style="display: none;">
+                    <div class="analysis-result">
+                        <div class="score-header">
+                            <div class="score-big" id="finalScore">85</div>
+                            <div class="verdict-text" id="verdict">Solid!</div>
+                        </div>
+                        
+                        <div class="ai-feedback">
+                            <h4>🤖 Analisis Gemini AI</h4>
+                            <div id="aiAnalysisText" style="white-space: pre-line;"></div>
+                        </div>
+
+                        <div class="ai-feedback" style="border-left-color: var(--accent); margin-top: 15px;">
+                            <h4 style="color: var(--accent);">💡 Saran Improvement</h4>
+                            <div id="aiSuggestions" style="white-space: pre-line;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let config = {
+            provider: localStorage.getItem('ai_provider') || 'gemini',
+            apiKey: localStorage.getItem('gemini_api_key') || localStorage.getItem('ai_api_key') || 'AIzaSyBWqRrhJcq1z2VbuDrgtSOrNXyuxGqEEp0',
+            model: localStorage.getItem('ai_model') || 'gemini-1.5-flash',
+            useOnline: false
+        };
+
+        let currentType = 'rizz';
+
+        const offlineDB = {
+            rizz: ["Rizz itu tentang confidence, bro.","Authenticity beats everything.","Make her laugh, make her stay."],
+            gombal: ["Kamu wifi? Soalnya koneksi kita kerasa banget.","Kamu kopi? Soalnya bikin nagih."],
+            pantun: ["Pergi ke pasar beli mangga,\nPulangnya lewat taman bunga.\nWajahmu manis tanpa beda,\nBikin hati ini senantiasa rindu."]
+        };
+
+        window.onload = () => {
+            if (config.apiKey) {
+                document.getElementById('apiKeyInput').value = config.apiKey;
+                document.getElementById('modelSelect').value = config.model;
+            }
+            updateProviderUI();
+            updateModeUI();
+        };
+
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('show');
+        }
+
+        function selectProvider(provider) {
+            config.provider = provider;
+            document.querySelectorAll('.provider-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const modelSelect = document.getElementById('modelSelect');
+            const label = document.getElementById('providerLabel');
+            
+            if (provider === 'gemini') {
+                label.textContent = '(Gemini - Gratis)';
+                modelSelect.innerHTML = `
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash (Cepat)</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro (Jempolan)</option>
+                    <option value="gemini-pro">Gemini Pro (Legacy)</option>
+                `;
+            } else if (provider === 'openai') {
+                label.textContent = '(OpenAI)';
+                modelSelect.innerHTML = `
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    <option value="gpt-4">GPT-4</option>
+                    <option value="gpt-4o-mini">GPT-4o Mini</option>
+                `;
+            } else if (provider === 'groq') {
+                label.textContent = '(Groq)';
+                modelSelect.innerHTML = `
+                    <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                    <option value="llama2-70b-4096">Llama2 70B</option>
+                `;
+            }
+        }
+
+        function updateProviderUI() {
+            // Set active button based on saved provider
+            const buttons = document.querySelectorAll('.provider-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(config.provider)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function saveSettings() {
+            config.apiKey = document.getElementById('apiKeyInput').value.trim();
+            config.model = document.getElementById('modelSelect').value;
+            
+            if (config.provider === 'gemini') {
+                localStorage.setItem('gemini_api_key', config.apiKey);
+            } else {
+                localStorage.setItem('ai_api_key', config.apiKey);
+            }
+            localStorage.setItem('ai_model', config.model);
+            localStorage.setItem('ai_provider', config.provider);
+            
+            document.getElementById('settingsModal').classList.remove('show');
+            
+            if (config.useOnline && !config.apiKey) {
+                alert('API Key belum diisi! Mode akan kembali ke Offline.');
+                config.useOnline = false;
+                updateModeUI();
+            }
+        }
+
+        function toggleMode() {
+            if (!config.apiKey) {
+                alert('API Key belum diisi! Buka Settings dulu.');
+                openSettings();
+                return;
+            }
+            config.useOnline = !config.useOnline;
+            updateModeUI();
+        }
+
+        function updateModeUI() {
+            const toggle = document.getElementById('modeToggle');
+            const badge = document.getElementById('statusBadge');
+            const text = document.getElementById('statusText');
+            const desc = document.getElementById('modeDescription');
+            
+            if (config.useOnline) {
+                toggle.classList.add('active');
+                badge.className = 'status-badge status-online';
+                text.textContent = `Online (${config.provider})`;
+                desc.textContent = `Mode Online: Menggunakan ${config.provider === 'gemini' ? 'Gemini AI' : 'AI API'}`;
+            } else {
+                toggle.classList.remove('active');
+                badge.className = 'status-badge status-offline';
+                text.textContent = 'Offline Mode';
+                desc.textContent = 'Mode Offline: Menggunakan algoritma lokal';
+            }
+        }
+
+        function selectType(type) {
+            currentType = type;
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('subMenu').classList.add('active');
+            document.getElementById('selectedType').textContent = type;
+            document.getElementById('genType').textContent = type;
+            document.getElementById('rateType').textContent = type;
+        }
+
+        function goBack(target) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(target).classList.add('active');
+            document.getElementById('rateResult').style.display = 'none';
+            document.getElementById('userInput').value = '';
+            document.getElementById('genError').style.display = 'none';
+            document.getElementById('rateError').style.display = 'none';
+        }
+
+        function showGenerate() {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('generateSection').classList.add('active');
+            document.getElementById('genContent').innerHTML = '<span style="opacity: 0.5;">Siap generate...</span>';
+        }
+
+        function showRate() {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('rateSection').classList.add('active');
+        }
+
+        // Gemini API Call
+        async function callGemini(prompt) {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${config.apiKey}`;
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{text: prompt}]
+                    }],
+                    generationConfig: {
+                        temperature: 0.9,
+                        maxOutputTokens: 800,
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || `HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+                throw new Error('Response format tidak valid');
+            }
+
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        // Generic API Call (for other providers)
+        async function callOtherAI(prompt) {
+            let endpoint, body, headers;
+            
+            if (config.provider === 'groq') {
+                endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+                headers = {
+                    'Authorization': `Bearer ${config.apiKey}`,
+                    'Content-Type': 'application/json'
+                };
+                body = JSON.stringify({
+                    model: config.model,
+                    messages: [{role: "user", content: prompt}],
+                    temperature: 0.9
+                });
+            } else {
+                endpoint = 'https://api.openai.com/v1/chat/completions';
+                headers = {
+                    'Authorization': `Bearer ${config.apiKey}`,
+                    'Content-Type': 'application/json'
+                };
+                body = JSON.stringify({
+                    model: config.model,
+                    messages: [{role: "user", content: prompt}],
+                    temperature: 0.9
+                });
+            }
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: headers,
+                body: body
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error?.message || 'API Error');
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        async function generateContent() {
+            const btn = document.getElementById('genBtn');
+            const loading = document.getElementById('genLoading');
+            const content = document.getElementById('genContent');
+            const error = document.getElementById('genError');
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            content.style.display = 'none';
+            error.style.display = 'none';
+
+            try {
+                let resultText = '';
+
+                if (config.useOnline) {
+                    let prompt = '';
+                    if (currentType === 'gombal') {
+                        prompt = `Buatkan 1 pickup line gombal cheesy ala anak Jaksel yang lucu tapi gak cringe banget. Maksimal 2 kalimat. Langsung kasih line-nya aja tanpa tambahan kata "ini" atau penjelasan.`;
+                    } else if (currentType === 'rizz') {
+                        prompt = `Buatkan 1 kalimat rizz/charming yang confident tapi humble, ala cowok cool jakarta. Natural, gak dipaksain, gak lebay. Maksimal 25 kata. Langsung kasih kalimatnya aja.`;
+                    } else if (currentType === 'pantun') {
+                        prompt = `Buatkan 1 pantun 4 baris A-B-A-B yang isinya flirt/cinta tapi sopan. Yang tradisional tapi lucu. Format: 2 baris sampiran, 2 baris isi.`;
+                    }
+
+                    if (config.provider === 'gemini') {
+                        resultText = await callGemini(prompt);
+                    } else {
+                        resultText = await callOtherAI(prompt);
+                    }
+                } else {
+                    await new Promise(r => setTimeout(r, 500));
+                    const db = offlineDB[currentType];
+                    resultText = db[Math.floor(Math.random() * db.length)];
+                }
+
+                content.style.display = 'block';
+                content.innerHTML = '<span class="typing-cursor"></span>';
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < resultText.length) {
+                        content.innerHTML = resultText.substring(0, i + 1) + '<span class="typing-cursor"></span>';
+                        i++;
+                        setTimeout(typeWriter, 30);
+                    } else {
+                        content.innerHTML = resultText.replace(/\n/g, '<br>');
+                    }
+                };
+                typeWriter();
+
+            } catch (err) {
+                error.textContent = '❌ Error: ' + err.message + (err.message.includes('404') ? '. Model tidak ditemukan, coba ganti model di settings.' : '');
+                error.style.display = 'block';
+                content.style.display = 'block';
+            } finally {
+                loading.classList.remove('show');
+                btn.disabled = false;
+            }
+        }
+
+        async function analyzeContent() {
+            const input = document.getElementById('userInput').value.trim();
+            const btn = document.getElementById('rateBtn');
+            const loading = document.getElementById('rateLoading');
+            const result = document.getElementById('rateResult');
+            const error = document.getElementById('rateError');
+
+            if (!input) {
+                alert('Isi dulu dong kontennya!');
+                return;
+            }
+
+            btn.disabled = true;
+            loading.classList.add('show');
+            result.style.display = 'none';
+            error.style.display = 'none';
+
+            try {
+                let analysis = {};
+
+                if (config.useOnline) {
+                    const prompt = `Kamu adalah expert dating coach. Analisis ${currentType} berikut dan kasih rating 1-100.
+
+Konten: "${input}"
+
+Berikan response dalam format:
+SCORE: [angka 1-100]
+VERDICT: [satu kalimat penilaian lucu/gaul]
+ANALISIS: [review detail 2-3 kalimat]
+SARAN: [2-3 poin improvement]
+
+Panduan penilaian:
+- Gombal: Nilai creativity, kedalaman cheesiness, dan potensi bikin doi ketawa/baper
+- Rizz: Nilai confidence, authenticity, dan smoothness
+- Pantun: Nilai struktur 4 baris, rima, dan keterkaitan sampiran-isi`;
+
+                    let responseText;
+                    if (config.provider === 'gemini') {
+                        responseText = await callGemini(prompt);
+                    } else {
+                        responseText = await callOtherAI(prompt);
+                    }
+                    
+                    const scoreMatch = responseText.match(/SCORE:\s*(\d+)/);
+                    const verdictMatch = responseText.match(/VERDICT:\s*(.+)/);
+                    const analysisMatch = responseText.match(/ANALISIS:\s*([\s\S]+?)(?=SARAN:|$)/);
+                    const saranMatch = responseText.match(/SARAN:\s*([\s\S]+)/);
+
+                    analysis = {
+                        score: scoreMatch ? parseInt(scoreMatch[1]) : 75,
+                        verdict: verdictMatch ? verdictMatch[1].trim() : 'Mantap!',
+                        analysis: analysisMatch ? analysisMatch[1].trim() : responseText,
+                        suggestions: saranMatch ? saranMatch[1].trim() : 'Tingkatkan lagi kreativitasnya!'
+                    };
+
+                } else {
+                    await new Promise(r => setTimeout(r, 800));
+                    analysis = performOfflineAnalysis(input, currentType);
+                }
+
+                document.getElementById('finalScore').textContent = analysis.score;
+                document.getElementById('verdict').textContent = analysis.verdict;
+                document.getElementById('aiAnalysisText').textContent = analysis.analysis;
+                document.getElementById('aiSuggestions').textContent = analysis.suggestions;
+                
+                const scoreEl = document.getElementById('finalScore');
+                if (analysis.score >= 85) {
+                    scoreEl.style.background = 'linear-gradient(135deg, #00ff88, #4285f4)';
+                } else if (analysis.score >= 60) {
+                    scoreEl.style.background = 'linear-gradient(135deg, #fbbc05, #ea4335)';
+                } else {
+                    scoreEl.style.background = 'linear-gradient(135deg, #ea4335, #ff00aa)';
+                }
+                scoreEl.style.webkitBackgroundClip = 'text';
+                scoreEl.style.webkitTextFillColor = 'transparent';
+
+                result.style.display = 'block';
+
+            } catch (err) {
+                error.textContent = '❌ Error: ' + err.message;
+                error.style.display = 'block';
+            } finally {
+                loading.classList.remove('show');
+                btn.disabled = false;
+            }
+        }
+
+        function performOfflineAnalysis(text, type) {
+            let score = 70;
+            let verdict = score >= 80 ? '🔥 Mantap!' : score >= 60 ? '👍 Lumayan' : '💀 Perlu diasah';
+            
+            return {
+                score: score,
+                verdict: verdict,
+                analysis: `Analisis offline: Konten ini ${score >= 70 ? 'cukup oke' : 'perlu diasah'} untuk ${type}.`,
+                suggestions: '1. Hidupkan AI Mode untuk analisis detail\n2. Tambahin personal touch\n3. Perhatiin delivery'
+            };
+        }
+    </script>
+</body>
+</html>
